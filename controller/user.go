@@ -9,9 +9,9 @@ import (
 	"github.com/structe/go-meeting/utils"
 )
 
-type SignInData struct {
-	UserName string `json:"username"`
-	PassWord string `json:"password"`
+type PostData struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
 }
 
 func SignUp(c *gin.Context) {
@@ -19,12 +19,15 @@ func SignUp(c *gin.Context) {
 		user model.User
 		res  = gin.H{}
 		err  error
+		data PostData
 	)
 
-	if err = c.BindJSON(&user); err != nil {
+	if err = c.ShouldBindJSON(&data); err != nil {
 		utils.SendBadResponse(c, "internal error")
 		return
 	}
+	user.Email = data.Email
+	user.Password = data.Password
 	if len(user.Email) == 0 || len(user.Password) == 0 {
 		utils.SendBadResponse(c, "email or password cannot be null")
 		return
@@ -44,14 +47,14 @@ func SignIn(c *gin.Context) {
 		user *model.User
 		res  = gin.H{}
 		err  error
+		data PostData
 	)
-	if err = c.BindJSON(&user); err != nil {
+	if err = c.ShouldBindJSON(&data); err != nil {
 		utils.SendBadResponse(c, "internal error")
-		c.JSON(http.StatusOK, res)
 		return
 	}
-	email := user.Email
-	password := user.Password
+	email := data.Email
+	password := data.Password
 	if email == "" || password == "" {
 		utils.SendBadResponse(c, "username or password cannot be null")
 		return

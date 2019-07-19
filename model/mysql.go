@@ -8,7 +8,7 @@ import (
 var DB *gorm.DB
 
 func InitMysql() (*gorm.DB, error) {
-	db, err := gorm.Open("mysql", "user:password@/dbname?charset=utf8&parseTime=True&loc=Local")
+	db, err := gorm.Open("mysql", "root:box132@tcp(localhost:3500)/meeting?charset=utf8&parseTime=True&loc=Local")
 	if err == nil {
 		DB = db
 		db.AutoMigrate(&User{})

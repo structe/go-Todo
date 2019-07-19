@@ -10,7 +10,7 @@ import (
 
 // 错误请求
 func SendBadResponse(c *gin.Context, err string) {
-	c.JSON(http.StatusOK, gin.H{
+	c.JSON(http.StatusBadGateway, gin.H{
 		"msg": err,
 	})
 	// 中止请求链

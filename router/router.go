@@ -6,7 +6,7 @@ import (
 )
 
 func Route(router *gin.Engine) {
-	api := router.Group("/api")
+	api := router.Group("/meet/api")
 
 	{
 		api.POST("/signin", user.SignIn)
