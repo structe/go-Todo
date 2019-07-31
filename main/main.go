@@ -12,6 +12,8 @@ import (
 func main() {
 	fmt.Println("gin version: ", gin.Version)
 
+	config.InitConfig()
+
 	//gin.SetMode(gin.ReleaseMode)
 
 	// Creates a router without any middleware by default
@@ -19,10 +21,10 @@ func main() {
 
 	db, err := model.InitMysql()
 	if err != nil {
+		fmt.Println(err)
 		return
 	}
 	defer db.Close()
-	config.InitConfig()
 
 	router.Route(app)
 

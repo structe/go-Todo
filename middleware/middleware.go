@@ -11,12 +11,12 @@ import (
 
 type CustomClaims struct {
 	UserName string `json:"username"`
-	ID       uint   `json:"id"`
+	ID       int    `json:"id"`
 	jwt.StandardClaims
 }
 
 //创建jwttoken
-func CreateJwtToken(c *gin.Context, ID uint, UserName string) {
+func CreateJwtToken(c *gin.Context, ID int, UserName string) {
 	// Create the Claims
 	claims := CustomClaims{
 		UserName,
@@ -36,7 +36,28 @@ func CreateJwtToken(c *gin.Context, ID uint, UserName string) {
 	SetCookie(c, "token", tokenString)
 }
 
+//解析jwt
+func ParseJwtToken(tokenString string) bool {
+	token, err := jwt.ParseWithClaims(tokenString, &CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
+		return []byte(config.TokenSecret), nil
+	})
+	_, ok := token.Claims.(*CustomClaims)
+	return ok && token.Valid && err == nil
+}
+
 //设置cookie
 func SetCookie(c *gin.Context, name string, value string) {
 	c.SetCookie(name, value, config.CooKieMaxAge*60*60, "/", "", false, true)
+}
+
+func CheckToken(c *gin.Context) error {
+	token, err := c.Cookie("token")
+	if err != nil {
+		return err
+	}
+	flag := ParseJwtToken(token)
+	if flag != true {
+		return err
+	}
+	return err
 }

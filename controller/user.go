@@ -1,6 +1,7 @@
-package user
+package controller
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -24,6 +25,7 @@ func SignUp(c *gin.Context) {
 
 	if err = c.ShouldBindJSON(&data); err != nil {
 		utils.SendBadResponse(c, "internal error")
+		fmt.Println(err)
 		return
 	}
 	user.Email = data.Email
@@ -32,7 +34,7 @@ func SignUp(c *gin.Context) {
 		utils.SendBadResponse(c, "email or password cannot be null")
 		return
 	}
-	user.Password = utils.SHA256Str(user.Email + user.Password)
+	user.Password = utils.SHA256Str(user.Password)
 	err = user.Insert()
 	if err != nil {
 		utils.SendBadResponse(c, "email exists")
@@ -61,11 +63,12 @@ func SignIn(c *gin.Context) {
 	}
 
 	user, err = model.GetUserByEmail(email)
-	if err != nil || user.Password != utils.SHA256Str(email+password) {
+	if err != nil || user.Password != utils.SHA256Str(password) {
 		utils.SendBadResponse(c, "invalid username or password")
 		return
 	}
 	mw.CreateJwtToken(c, user.ID, user.Email)
 	res["message"] = "succeed"
+	res["userid"] = user.ID
 	c.JSON(http.StatusOK, res)
 }
